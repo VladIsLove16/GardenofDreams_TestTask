@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement style="flex-grow: 1; flex-direction: row-reverse;">
+        <ui:VisualElement name="RightPanel" style="flex-grow: 0; height: 212px; width: 325px; flex-basis: 20%; align-self: flex-end; flex-direction: row; justify-content: flex-start; align-items: center; top: auto;">
+            <ui:Button parse-escape-sequences="true" display-tooltip-when-elided="true" name="Shootbtn" style="align-self: auto; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-top-left-radius: 100px; border-top-right-radius: 100px; border-bottom-right-radius: 100px; border-bottom-left-radius: 100px; width: 200px; height: 200px; font-size: 56px; background-image: url(&quot;project://database/Assets/Sprites/0b5a07085446250.png?fileID=2800000&amp;guid=eb4e515bd3b11ef448a70183c6605b37&amp;type=3#0b5a07085446250&quot;); -unity-background-scale-mode: scale-to-fit; background-color: rgba(188, 188, 188, 0.51); margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+            <ui:Button text="Inventory" parse-escape-sequences="false" display-tooltip-when-elided="false" name="Inventorybtn" />
+            <ui:Button text="DeleteInInventory" parse-escape-sequences="false" display-tooltip-when-elided="true" name="DeleteInInventorybtn" />
+        </ui:VisualElement>
+        <ui:VisualElement name="LeftPanel" style="flex-grow: 1; flex-direction: column-reverse;">
+            <ui:VisualElement name="JoystickBase" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Sprites/png-transparent-circle-black-and-white-circle-angle-white-symmetry-thumbnail%20(1).jpg?fileID=21300000&amp;guid=dd710d5267d752441a43464c1c07b642&amp;type=3#png-transparent-circle-black-and-white-circle-angle-white-symmetry-thumbnail (1)&quot;); -unity-background-image-tint-color: rgba(255, 255, 255, 0.26); width: 350px; height: 350px; position: relative; top: -40px; left: 40px; align-self: flex-start; flex-direction: column; display: flex;">
+                <ui:VisualElement name="JoystickThumb" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Sprites/png-transparent-circle-black-and-white-circle-angle-white-symmetry-thumbnail%20(1).jpg?fileID=21300000&amp;guid=dd710d5267d752441a43464c1c07b642&amp;type=3#png-transparent-circle-black-and-white-circle-angle-white-symmetry-thumbnail (1)&quot;); -unity-background-image-tint-color: rgba(255, 255, 255, 0.47); height: 80px; width: 80px; align-self: auto; position: relative; top: 111px; left: 22px;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
