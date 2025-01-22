@@ -1,8 +1,9 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:Template name="Inventory" src="project://database/Assets/Inventory/Assets/WUG/UI/Inventory.uxml?fileID=9197481963319205126&amp;guid=398c6f54d2157db49b2b77bd35f612fe&amp;type=3#Inventory" />
     <ui:VisualElement style="flex-grow: 1; flex-direction: row-reverse;">
         <ui:VisualElement name="RightPanel" style="flex-grow: 0; height: 212px; width: 325px; flex-basis: 20%; align-self: flex-end; flex-direction: row; justify-content: flex-start; align-items: center; top: auto;">
             <ui:Button parse-escape-sequences="true" display-tooltip-when-elided="true" name="Shootbtn" style="align-self: auto; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-top-left-radius: 100px; border-top-right-radius: 100px; border-bottom-right-radius: 100px; border-bottom-left-radius: 100px; width: 200px; height: 200px; font-size: 56px; background-image: url(&quot;project://database/Assets/Sprites/0b5a07085446250.png?fileID=2800000&amp;guid=eb4e515bd3b11ef448a70183c6605b37&amp;type=3#0b5a07085446250&quot;); -unity-background-scale-mode: scale-to-fit; background-color: rgba(188, 188, 188, 0.51); margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
-            <ui:Button text="Inventory" parse-escape-sequences="false" display-tooltip-when-elided="false" name="Inventorybtn" />
+            <ui:Button text="Inventory" parse-escape-sequences="false" display-tooltip-when-elided="false" name="Inventorybtn" style="width: 200px; height: 200px; font-size: 36px;" />
             <ui:Button text="DeleteInInventory" parse-escape-sequences="false" display-tooltip-when-elided="true" name="DeleteInInventorybtn" />
         </ui:VisualElement>
         <ui:VisualElement name="LeftPanel" style="flex-grow: 1; flex-direction: column-reverse;">
@@ -11,4 +12,5 @@
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
+    <ui:Instance template="Inventory" name="Inventory" style="position: absolute; height: 644px; width: 2565px;" />
 </ui:UXML>

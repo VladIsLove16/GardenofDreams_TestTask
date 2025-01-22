@@ -32,7 +32,6 @@ public class Joystick
         if (Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
-            Debug.Log("touch.phase " + touch.phase + touch.position);
 
             switch (touch.phase)
             {
@@ -116,11 +115,7 @@ public class Joystick
 
         joystickThumb.style.left = joystickCenter.x - joystickBase.worldBound.position.x + direction.x -  joystickThumb.resolvedStyle.width / 2;
         joystickThumb.style.top = joystickCenter.y - joystickBase.worldBound.position.y + direction.y - joystickThumb.resolvedStyle.height / 2;
-        //joystickThumb.style.left = joystickCenter.x + direction.x - joystickThumb.resolvedStyle.width / 2;
-        //joystickThumb.style.top = joystickCenter.y + direction.y - joystickThumb.resolvedStyle.height / 2;
 
-        Debug.Log("joystickThumb.style.left " + joystickThumb.style.left);
-        Debug.Log("joystickThumb.style.right " + joystickThumb.style.right);
 
     }
 
@@ -128,8 +123,6 @@ public class Joystick
     {
         joystickThumb.style.left = joystickCenter.x - joystickBase.worldBound.position.x - joystickThumb.resolvedStyle.width / 2;
         joystickThumb.style.top = joystickCenter.y - joystickBase.worldBound.position.y - joystickThumb.resolvedStyle.height / 2;
-        Debug.Log("joystickThumb.style.left " + joystickThumb.style.left);
-        Debug.Log("joystickThumb.style.top " + joystickThumb.style.top);
 
         joystickDirection = Vector2.zero;
 

@@ -1,9 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
-using System;
-using TMPro;
-using static UnityEngine.EventSystems.EventTrigger;
-
 public class CharacterLogicController : MonoBehaviour
 {
     public float moveSpeed = 5f; 
@@ -21,10 +16,11 @@ public class CharacterLogicController : MonoBehaviour
     public LayerMask itemLayer; 
 
     private Vector2 movementDirection; 
-    private List<GameObject> inventory = new List<GameObject>();
-
     public delegate void OnHealthChanged(float currentHealth, float maxHealth);
     public event OnHealthChanged HealthChanged;
+
+    [SerializeField]
+    InventoryController inventoryController;
 
     public delegate void OnItemPickedUp(GameObject item);
     public event OnItemPickedUp ItemPickedUp;
@@ -49,7 +45,6 @@ public class CharacterLogicController : MonoBehaviour
         HandleMovement();
         HandleRotation();
         HandleAiming();
-        HandleItemPickup();
     }
 
     private void HandleRotation()
@@ -114,6 +109,10 @@ public class CharacterLogicController : MonoBehaviour
             ShootAtPosition(shootDirection + new Vector2( firePoint.transform.position.x, firePoint.transform.position.y));
         }
     }
+    public InventoryController GetInventoryController()
+    {
+        return inventoryController;
+    }
     private void ShootAtPosition(Vector2 position)
     {
         if (projectilePrefab != null && firePoint != null)
@@ -138,20 +137,7 @@ public class CharacterLogicController : MonoBehaviour
         ShootAtPosition(enemy.transform.position);
     }
 
-    //можно сделать через колайдеры, скорее всего так будет производительнее
-    void HandleItemPickup()
-    {
-        Collider2D[] itemsInRange = Physics2D.OverlapCircleAll(transform.position, 2f, itemLayer);
-        foreach (var item in itemsInRange)
-        {
-            if (!inventory.Contains(item.gameObject))
-            {
-                inventory.Add(item.gameObject);
-                item.gameObject.SetActive(false);
-                ItemPickedUp?.Invoke(item.gameObject); 
-            }
-        }
-    }
+    
 
     public void TakeDamage(float damage)
     {
@@ -169,4 +155,19 @@ public class CharacterLogicController : MonoBehaviour
     {
         Debug.Log("Персонаж умер!");
     }
+
+    //internal bool TryPickupItem(ItemDetails itemDetails)
+    //{
+    //    if (inventoryController.HaveSpace(itemDetails))
+    //    {
+    //        PickupItem(itemDetails);
+    //        return true;
+    //    }
+    //    else
+    //        return false;
+    //}
+    //private void PickupItem(ItemDetails itemDetails)
+    //{
+    //    inventoryController.AddItem(itemDetails);
+    //}
 }
