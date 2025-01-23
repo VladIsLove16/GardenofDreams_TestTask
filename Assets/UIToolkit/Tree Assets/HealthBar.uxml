@@ -1,0 +1,4 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/UnityThemes/HealthBar.uss?fileID=7433441132597879392&amp;guid=fd10d1e47ec3b294ea518174055ab617&amp;type=3#HealthBar" />
+    <ui:ProgressBar name="healthProgress" value="20" class="healthBar" />
+</ui:UXML>
