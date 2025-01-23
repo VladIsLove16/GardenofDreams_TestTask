@@ -13,6 +13,7 @@ public class GameUI : MonoBehaviour
     private VisualElement LeftPanel;
     private Joystick joystick;
     private Button Shootbtn;
+    private Button DeleteItembtn;
     private Button Inventorybtn;
     [SerializeField]
     private bool isTouching; 
@@ -42,6 +43,7 @@ public class GameUI : MonoBehaviour
         Debug.Assert(LeftPanel != null, "LeftPanel is null");
 
         Shootbtn = RightPanel.Q("Shootbtn") as Button;
+        DeleteItembtn = RightPanel.Q("DeleteItembtn") as Button;
         Inventorybtn = RightPanel.Q("Inventorybtn") as Button;
 
         var JoystickBase = LeftPanel.Q("JoystickBase");
@@ -52,7 +54,17 @@ public class GameUI : MonoBehaviour
     {
         Shootbtn.clicked += ShootbtnClicked;
         Inventorybtn.clicked += InventorybtnClicked;
+        DeleteItembtn.clicked += DeleteItembtnClicked;
     }
+
+    private void DeleteItembtnClicked()
+    {
+        InventorySlot inventorySlot = InventoryUIController.GetSelectedSlot();
+        InventoryController inventoryController = characterLogicController.GetInventoryController();
+        ItemDetails item = inventoryController.GetItemByGuid(inventorySlot.ItemGuid);
+        inventoryController.RemoveItem(item);
+    }
+
     private void ShootbtnClicked()
     {
         characterLogicController.Shoot();

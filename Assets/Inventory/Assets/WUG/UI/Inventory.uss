@@ -46,20 +46,36 @@
     width: 128px;
     height: 128px;
     margin: 5px;
-    border-left-color: rgb(48, 48, 48);
-    border-right-color: rgb(48, 48, 48);
-    border-top-color: rgb(48, 48, 48);
-    border-bottom-color: rgb(48, 48, 48);
     background-color: rgb(9, 19, 21);
     background-image: url("project://database/Assets/Inventory/Assets/WUG/Sprites/ItemSlotBackground.png?fileID=21300000&guid=9775dedc597859d4e8a501720a97fac4&type=3#ItemSlotBackground");
-    border-top-left-radius: 3px;
-    border-bottom-left-radius: 3px;
-    border-top-right-radius: 3px;
-    border-bottom-right-radius: 3px;
 }
 
 .slotIcon {
     flex-shrink: 0;
     flex-grow: 1;
     padding: 15px;
+}
+
+.slotCount {
+    width: 28px;
+    height: 28px;
+    align-self: flex-end;
+    font-size: 20px;
+    color: rgb(255, 255, 255);
+    right: -7px;
+    bottom: 1px;
+    position: absolute;
+}
+
+.slotContainerSelected {
+    margin: 5px;
+    border-top-width: 3px;
+    border-right-width: 3px;
+    border-bottom-width: 3px;
+    border-left-width: 3px;
+    border-left-color: rgba(255, 0, 0, 0.94);
+    border-right-color: rgba(255, 0, 0, 0.94);
+    border-top-color: rgba(255, 0, 0, 0.94);
+    border-bottom-color: rgba(255, 0, 0, 0.94);
+    cursor: url("project://database/Assets/Sprites/0b5a07085446250.png?fileID=2800000&guid=eb4e515bd3b11ef448a70183c6605b37&type=3#0b5a07085446250");
 }

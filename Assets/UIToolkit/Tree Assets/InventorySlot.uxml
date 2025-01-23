@@ -1,0 +1,4 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Inventory/Assets/WUG/UI/Inventory.uss?fileID=7433441132597879392&amp;guid=454825772093c7840be3d857971743dd&amp;type=3#Inventory" />
+    <Assets.WUG.Scripts.InventorySlot name="slot" class="slotContainerSelected" style="height: 64px; width: 64px;" />
+</ui:UXML>

@@ -14,7 +14,9 @@ namespace Assets.WUG.Scripts
     public class InventorySlot : VisualElement
     {
         public Image Icon;
+        public Label CountLabel;
         public string ItemGuid = "";
+        private const string slotContainerSelectedClass = "slotContainerSelected";
         private InventoryUIController inventoryUIController;
         public void Init(InventoryUIController inventoryUIController)
         {
@@ -22,18 +24,33 @@ namespace Assets.WUG.Scripts
         }
         public InventorySlot()
         {
+            CountLabel = new Label();
+            Add(CountLabel);
+            CountLabel.text = "000";
+
             //Create a new Image element and add it to the root
             Icon = new Image();
             Add(Icon);
 
+            
+
             //Add USS style properties to the elements
             Icon.AddToClassList("slotIcon");
+            CountLabel.AddToClassList("slotCount");
             AddToClassList("slotContainer");
 
             //Register event listeners
             RegisterCallback<PointerDownEvent>(OnPointerDown);
         }
-
+        public void SetSelected()
+        {
+            AddToClassList(slotContainerSelectedClass);
+            Debug.Log(ClassListContains(slotContainerSelectedClass));
+        }
+        public void SetUnselected()
+        {
+            RemoveFromClassList(slotContainerSelectedClass);
+        }
         private void OnPointerDown(PointerDownEvent evt)
         {
             //Not the left mouse button or this is an empty slotIn
@@ -49,15 +66,22 @@ namespace Assets.WUG.Scripts
             inventoryUIController.StartDrag(evt.position, this);
             
         }
-
         /// <summary>
         /// Sets the Icon and GUID properties
         /// </summary>
         /// <param name="item"></param>
-        public void HoldItem(ItemDetails item)
+        /// <param name="count"> Count of items</param>
+        ///
+        public void HoldItem(ItemDetails item,int count)
         {
+            if (count == 0)
+                return;
             Icon.image = item.Icon.texture;
             ItemGuid = item.GUID;
+            if (count == 1)
+                CountLabel.text = "";
+            else
+                CountLabel.text = count.ToString();
         }
 
         /// <summary>
@@ -67,6 +91,7 @@ namespace Assets.WUG.Scripts
         {
             ItemGuid = "";
             Icon.image = null;
+            CountLabel.text = "";
         }
         public bool IsHoldingItem()
         {

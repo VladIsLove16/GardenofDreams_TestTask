@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-
-using UnityEngine.UIElements;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Assets.WUG.Scripts
 {
     public class InventoryUIController 
     {
-        public List<InventorySlot> InventorySlots = new List<InventorySlot>();
+        public Dictionary<InventorySlot, string> InventorySlots = new ();
 
         private  VisualElement m_Root;
         private  VisualElement m_SlotContainer;
@@ -16,6 +16,7 @@ namespace Assets.WUG.Scripts
         
         private  bool m_IsDragging;
         private  InventorySlot m_OriginalSlot;
+        private  InventorySlot m_LastSelectedSlot;
         private InventoryController inventoryController;
         public void Setup(VisualElement inventoryRoot, InventoryController inventoryController)
         {
@@ -33,17 +34,21 @@ namespace Assets.WUG.Scripts
                 InventorySlot slot = new InventorySlot();
                 slot.Init(this);
 
-                InventorySlots.Add(slot);
+                InventorySlots.Add(slot,"");
 
                 m_SlotContainer.Add(slot);
             }
 
             //Register event listeners
             inventoryController.OnInventoryChanged += GameController_OnInventoryChanged;
-            GameController_OnInventoryChanged(inventoryController.GetAllItemDetails().Select(item=>item.GUID).ToArray(), InventoryChangeType.Pickup);
+            InventoryChangeData data = new InventoryChangeData()
+            {
+                Items = inventoryController.GetAllItemDetailsByGuid(),
+                ChangeType = InventoryChangeType.Pickup
+            };
+            GameController_OnInventoryChanged(data);
             m_GhostIcon.RegisterCallback<PointerMoveEvent>(OnPointerMove);
             m_GhostIcon.RegisterCallback<PointerUpEvent>(OnPointerUp);
-
             if(inventoryController.OpenOnStart)
                 m_Root.style.visibility = Visibility.Visible;
             else
@@ -60,6 +65,7 @@ namespace Assets.WUG.Scripts
             //Set tracking variables
             m_IsDragging = true;
             m_OriginalSlot = originalSlot;
+            Select(originalSlot);
 
             //Set the new position
             //Vector2 UIToollkitPostion = new Vector2(ScreenPosition.x, Screen.height - ScreenPosition.y);
@@ -73,6 +79,27 @@ namespace Assets.WUG.Scripts
             //Flip the visibility on
             m_GhostIcon.style.visibility = Visibility.Visible;
 
+        }
+        public InventorySlot GetSelectedSlot()
+        {
+            return m_LastSelectedSlot;
+        }
+        private void UnSelect(InventorySlot m_LastSelectedSlot)
+        {
+            if (m_LastSelectedSlot == null)
+                return;
+            m_LastSelectedSlot.SetUnselected();
+        }
+
+        private void Select(InventorySlot selectedSlot)
+        {
+            if(selectedSlot!=null && m_LastSelectedSlot!= selectedSlot)
+            {
+                UnSelect(m_LastSelectedSlot);
+                selectedSlot.SetSelected();
+                m_LastSelectedSlot = selectedSlot;
+            }
+            return;
         }
 
         /// <summary>
@@ -105,23 +132,22 @@ namespace Assets.WUG.Scripts
             }
 
             //Check to see if they are dropping the ghost icon over any inventory slots.
-            IEnumerable<InventorySlot> slots = InventorySlots.Where(x => x.worldBound.Overlaps(m_GhostIcon.worldBound));
+            IEnumerable<InventorySlot> slots = InventorySlots.Keys.Where(x => x.worldBound.Overlaps(m_GhostIcon.worldBound));
             Debug.Log(slots.Count() + " slots.Count()");
             //Found at least one
             if (slots.Count() != 0)
             {
                 InventorySlot closestSlot = slots.OrderBy(x => Vector2.Distance(x.worldBound.position, m_GhostIcon.worldBound.position)).First();
-                if(closestSlot.IsHoldingItem())
+                if(closestSlot.IsHoldingItem()) //swap
                 {
-                    string ClosestSlotItemGuid = closestSlot.GetGuid();
-                    closestSlot.HoldItem(inventoryController.GetItemByGuid(m_OriginalSlot.ItemGuid));
-                    m_OriginalSlot.HoldItem(inventoryController.GetItemByGuid(ClosestSlotItemGuid));
+                    Swap(closestSlot,m_OriginalSlot);
                 }
                 else
                 {
-                    closestSlot.HoldItem(inventoryController.GetItemByGuid(m_OriginalSlot.ItemGuid));
-                    m_OriginalSlot.DropItem();
+                    Move(m_OriginalSlot, closestSlot);
+                    
                 }
+                
             }
             else
             {
@@ -135,23 +161,73 @@ namespace Assets.WUG.Scripts
             m_GhostIcon.style.visibility = Visibility.Hidden;
         }
 
+        private void Move(InventorySlot from,InventorySlot to)
+        {
+            to.HoldItem(inventoryController.GetItemByGuid(from.ItemGuid), inventoryController.GetItemCount(from.ItemGuid));
+            Select(to);
+            from.DropItem();
+            InventorySlots[from] = "";
+            InventorySlots[to] = to.GetGuid();
+        }
+
+        private void Swap(InventorySlot closestSlot, InventorySlot originalSlot)
+        {
+            string ClosestSlotItemGuid = closestSlot.GetGuid();
+            closestSlot.HoldItem(inventoryController.GetItemByGuid(originalSlot.ItemGuid), inventoryController.GetItemCount(originalSlot.ItemGuid));
+            Select(closestSlot);
+            originalSlot.HoldItem(inventoryController.GetItemByGuid(ClosestSlotItemGuid), inventoryController.GetItemCount(ClosestSlotItemGuid));
+            InventorySlots[closestSlot] = closestSlot.GetGuid();
+            InventorySlots[originalSlot] = originalSlot.GetGuid();
+        }
+
         /// <summary>
         /// Listen for changes to the players inventory and act
         /// </summary>
         /// <param name="itemGuid">Reference ID for the Item Database</param>
         /// <param name="change">Type of change that occurred. This could be extended to handle drop logic.</param>
-        private void GameController_OnInventoryChanged(string[] itemGuid, InventoryChangeType change)
+        private void GameController_OnInventoryChanged(InventoryChangeData data)
         {
             //Loop through each item and if it has been picked up, add it to the next empty slot
-            foreach (string item in itemGuid)
+            foreach (string itemGUID in data.Items.Keys)
             {
-                if (change == InventoryChangeType.Pickup)
+                if (data.ChangeType == InventoryChangeType.Pickup)
                 {
-                   var emptySlot = InventorySlots.FirstOrDefault(x => x.ItemGuid.Equals(""));
-                    
-                    if (emptySlot != null)
+                    if (InventorySlots.ContainsValue(itemGUID))
                     {
-                        emptySlot.HoldItem(inventoryController.GetItemByGuid(item));
+                        InventorySlot slot = InventorySlots.FirstOrDefault(x => x.Key.GetGuid() == itemGUID).Key;
+                        slot.HoldItem(inventoryController.GetItemByGuid(itemGUID), inventoryController.GetItemCount(itemGUID));
+                        InventorySlots[slot] = itemGUID;
+                        return;
+                    }
+                    else
+                    {
+                        var emptyPairSlot_guid = InventorySlots.FirstOrDefault(x => x.Key.GetGuid() == "");
+                        if (!EqualityComparer<KeyValuePair<InventorySlot, string>>.Default.Equals(emptyPairSlot_guid, default))
+                        {
+                            emptyPairSlot_guid.Key.HoldItem(inventoryController.GetItemByGuid(itemGUID), data.Items[itemGUID]);
+                            InventorySlots[emptyPairSlot_guid.Key] = itemGUID;
+                        }
+                        else
+                            throw new System.Exception("empty ui slot not found for added inventory item" + inventoryController.GetItemByGuid(itemGUID).name);
+                    }
+                }
+                else if (data.ChangeType == InventoryChangeType.Drop)
+                {
+                    if(m_LastSelectedSlot.ItemGuid == itemGUID)
+                    {
+                        if (inventoryController.GetItemCount(itemGUID) == 0)
+                        {
+                            m_LastSelectedSlot.DropItem();
+                            UnSelect(m_LastSelectedSlot);
+                        }
+                        else
+                        { 
+                            m_LastSelectedSlot.HoldItem(inventoryController.GetItemByGuid(itemGUID), inventoryController.GetItemCount(itemGUID));
+                        }
+                    }
+                    else
+                    {
+                        throw new System.NotImplementedException();
                     }
                 }
             }

@@ -1,16 +1,19 @@
+using Assets.WUG.Scripts;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Windows;
+using static UnityEditor.Progress;
+using static UnityEditor.Timeline.Actions.MenuPriority;
 
 public enum InventoryChangeType
 {
     Pickup,
     Drop
 }
-public delegate void OnInventoryChangedDelegate(string[] itemGuid, InventoryChangeType change);
 
 /// <summary>
 /// Generates and controls access to the Item Database and Inventory Data
@@ -20,8 +23,8 @@ public class InventoryController : MonoBehaviour
     [SerializeField]
     List<ItemDetails> ItemDetails;
     private static Dictionary<string, ItemDetails> m_ItemDatabase = new Dictionary<string, ItemDetails>();
-    private List<ItemDetails> m_PlayerInventory = new List<ItemDetails>();
-    public event OnInventoryChangedDelegate OnInventoryChanged = delegate { };
+    private Dictionary<ItemDetails, int> m_PlayerInventory = new Dictionary<ItemDetails, int>();
+    public event Action<InventoryChangeData> OnInventoryChanged = delegate { };
     public int MaxSlotsCount = 24;
     [SerializeField]
     public bool OpenOnStart;
@@ -57,9 +60,25 @@ public class InventoryController : MonoBehaviour
 
         return null;
     }
-    public IEnumerable<ItemDetails> GetAllItemDetails()
+    public int GetItemCount(string guid)
+    {
+        ItemDetails itemDetails = GetItemByGuid(guid);
+        if (m_PlayerInventory.Keys.Contains(itemDetails))
+        {
+            return m_PlayerInventory[itemDetails];
+        }
+        return 0;
+    }
+    public Dictionary<ItemDetails,int> GetAllItemDetails()
     {
         return m_PlayerInventory;
+    }
+    public Dictionary<string,int> GetAllItemDetailsByGuid()
+    {
+        var Items = m_PlayerInventory.ToDictionary(
+                pair => pair.Key.GUID,
+                pair => pair.Value );
+        return Items;
     }
     public void AddOneItem()
     {
@@ -73,15 +92,57 @@ public class InventoryController : MonoBehaviour
     }
     public void AddItems(IEnumerable< ItemDetails> itemDetails)
     {
-        m_PlayerInventory.AddRange(itemDetails);
-        OnInventoryChanged.Invoke(itemDetails.Select(x => x.GUID).ToArray(), InventoryChangeType.Pickup);
+        Dictionary<ItemDetails, int> items = itemDetails.ToDictionary(item => item, item => 1);
+        AddItems(items);
     }
+    private void AddItems(Dictionary<ItemDetails,int> items)
+    {
+        foreach (var item in items) {
+            if (m_PlayerInventory.ContainsKey(item.Key))
+            {
+                m_PlayerInventory[item.Key] += item.Value;
+            }
+            else
+                m_PlayerInventory.Add(item.Key, item.Value);
+        }
 
+        Dictionary<string, int> transformedItems = items
+        .ToDictionary(
+        pair => pair.Key.GUID, 
+        pair => pair.Value     
+        );
+        InventoryChangeData inventoryChangeData = new InventoryChangeData()
+        {
+            Items = transformedItems,
+            ChangeType = InventoryChangeType.Pickup
+        };
+        OnInventoryChanged.Invoke(inventoryChangeData);
+    }
+    public bool RemoveItem(ItemDetails item)
+    {
+        if(m_PlayerInventory.ContainsKey(item))
+        {
+            m_PlayerInventory[item] -= 1;
+            if (m_PlayerInventory[item] == 0)
+                m_PlayerInventory.Remove(item);
+            InventoryChangeData inventoryChangeData = new InventoryChangeData()
+            {
+                Items = new Dictionary<string, int>
+                {
+                    { item.GUID,1 }
+                },
+                ChangeType = InventoryChangeType.Drop,
+            };
+            OnInventoryChanged.Invoke(inventoryChangeData);
+            return true;
+        }
+        return false;
+    }
     internal bool HaveSpace(ItemDetails itemDetails)
     {
        if(HaveSpace())
             return true;
-       else if(m_PlayerInventory.Contains(itemDetails))
+       else if(m_PlayerInventory.Keys.Contains(itemDetails))
             return true;
        else
             return false;
