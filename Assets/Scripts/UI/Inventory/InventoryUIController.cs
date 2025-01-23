@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -9,14 +10,15 @@ namespace Assets.WUG.Scripts
     public class InventoryUIController 
     {
         public List<InventorySlot> InventorySlots = new ();
-
+        public event Action ItemSelected; 
+        public event Action NoItemSelected;  
         private  VisualElement m_Root;
         private  VisualElement m_SlotContainer;
         private  VisualElement m_GhostIcon;
         
         private  bool m_IsDragging;
         private  InventorySlot m_OriginalSlot;
-        private  InventorySlot m_LastSelectedSlot;
+        private  InventorySlot m_SelectedSlot;
         private InventoryController inventoryController;
         public void Setup(VisualElement inventoryRoot, InventoryController inventoryController)
         {
@@ -82,22 +84,25 @@ namespace Assets.WUG.Scripts
         }
         public InventorySlot GetSelectedSlot()
         {
-            return m_LastSelectedSlot;
+            return m_SelectedSlot;
         }
-        private void UnSelect(InventorySlot m_LastSelectedSlot)
+        private void UnSelect(InventorySlot LastSelectedSlot)
         {
-            if (m_LastSelectedSlot == null)
+            if (LastSelectedSlot == null)
                 return;
-            m_LastSelectedSlot.SetUnselected();
+            LastSelectedSlot.SetUnselected();
+            m_SelectedSlot = null;
+            NoItemSelected.Invoke();
         }
 
         private void Select(InventorySlot selectedSlot)
         {
-            if(selectedSlot!=null && m_LastSelectedSlot!= selectedSlot)
+            if(selectedSlot!=null && m_SelectedSlot!= selectedSlot)
             {
-                UnSelect(m_LastSelectedSlot);
+                UnSelect(m_SelectedSlot);
                 selectedSlot.SetSelected();
-                m_LastSelectedSlot = selectedSlot;
+                m_SelectedSlot = selectedSlot;
+                ItemSelected.Invoke();
             }
             return;
         }
@@ -207,16 +212,16 @@ namespace Assets.WUG.Scripts
                 }
                 else if (data.ChangeType == InventoryChangeType.Drop)
                 {
-                    if(m_LastSelectedSlot.ItemGuid == itemGUID)
+                    if(m_SelectedSlot.ItemGuid == itemGUID)
                     {
                         if (inventoryController.GetItemCount(itemGUID) == 0)
                         {
-                            m_LastSelectedSlot.DropItem();
-                            UnSelect(m_LastSelectedSlot);
+                            m_SelectedSlot.DropItem();
+                            UnSelect(m_SelectedSlot);
                         }
                         else
                         { 
-                            m_LastSelectedSlot.HoldItem(inventoryController.GetItemByGuid(itemGUID), inventoryController.GetItemCount(itemGUID));
+                            m_SelectedSlot.HoldItem(inventoryController.GetItemByGuid(itemGUID), inventoryController.GetItemCount(itemGUID));
                         }
                     }
                     else

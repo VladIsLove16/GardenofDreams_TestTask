@@ -44,6 +44,9 @@ public class GameUI : MonoBehaviour
 
         Shootbtn = RightPanel.Q("Shootbtn") as Button;
         DeleteItembtn = RightPanel.Q("DeleteItembtn") as Button;
+        DeleteItembtn.style.visibility = Visibility.Hidden;
+        InventoryUIController.ItemSelected += () => DeleteItembtn.style.visibility = Visibility.Visible;
+        InventoryUIController.NoItemSelected += () => DeleteItembtn.style.visibility = Visibility.Hidden;
         Inventorybtn = RightPanel.Q("Inventorybtn") as Button;
 
         var JoystickBase = LeftPanel.Q("JoystickBase");
@@ -60,6 +63,7 @@ public class GameUI : MonoBehaviour
     private void DeleteItembtnClicked()
     {
         InventorySlot inventorySlot = InventoryUIController.GetSelectedSlot();
+        if(inventorySlot == null) return;
         InventoryController inventoryController = characterLogicController.GetInventoryController();
         ItemDetails item = inventoryController.GetItemByGuid(inventorySlot.ItemGuid);
         inventoryController.RemoveItem(item);
@@ -74,10 +78,15 @@ public class GameUI : MonoBehaviour
         if (InventoryRoot.style.visibility == Visibility.Visible)
         {
             InventoryRoot.style.visibility = Visibility.Hidden;
+            DeleteItembtn.style.visibility = Visibility.Hidden;
         }
         else
         {
             InventoryRoot.style.visibility = Visibility.Visible;
+            if(InventoryUIController.GetSelectedSlot() != null)
+            {
+                DeleteItembtn.style.visibility = Visibility.Visible;
+            }
         }
     }
 }
