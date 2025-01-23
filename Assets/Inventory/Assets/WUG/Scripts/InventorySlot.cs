@@ -74,6 +74,11 @@ namespace Assets.WUG.Scripts
         ///
         public void HoldItem(ItemDetails item,int count)
         {
+            if (item == null)
+            {
+                Debug.LogError("Cant hold null value");
+                return;
+            }
             if (count == 0)
                 return;
             Icon.image = item.Icon.texture;

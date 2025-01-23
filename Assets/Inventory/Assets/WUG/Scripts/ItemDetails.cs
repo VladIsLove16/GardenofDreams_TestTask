@@ -1,9 +1,7 @@
 ﻿using System;
 using UnityEditor;
 using UnityEngine;
-[Serializable]
-
-[CreateAssetMenu(fileName = "ItemDetails", menuName = "new ItemDetails",order = 0)]
+[CreateAssetMenu(fileName = "ItemDetailsList", menuName = "new ItemDetailsList",order = 0)]
 public class ItemDetails : ScriptableObject
 {
     public string Name;

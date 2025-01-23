@@ -4,10 +4,6 @@ using UnityEngine;
 public class ItemGO : MonoBehaviour
 {
     public ItemDetails ItemDetails;
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-       
-    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         CharacterLogicController characterLogicController = collision.gameObject.GetComponent<CharacterLogicController>();

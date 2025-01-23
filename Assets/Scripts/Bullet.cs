@@ -2,13 +2,21 @@
 
 public class Bullet : MonoBehaviour
 {
+    [SerializeField]
+    bool DestoryOnTrigger;
     public int Damage;
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        Enemy Enemy = collision.collider.GetComponent<Enemy>();
+        Enemy Enemy = collision.GetComponent<Enemy>();
         if (Enemy != null)
         {
-            Enemy.TakeDamage(Damage);
+            HealthComponent healthComponent = Enemy.GetComponent<HealthComponent>();
+            if (healthComponent != null)
+            { 
+                healthComponent.TakeDamage(Damage);
+                if (DestoryOnTrigger)
+                    Destroy(gameObject);
+            }
         }
     }
 }

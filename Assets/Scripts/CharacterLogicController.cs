@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 public class CharacterLogicController : MonoBehaviour
 {
     public float moveSpeed = 5f; 
     public float rotationSpeed = 5f; 
     public float attackRange = 5f; 
-    public float health = 100f; 
-    public float maxHealth = 100f; 
+  
     public GameObject projectilePrefab; 
     public Transform firePoint;
     [SerializeField]
@@ -15,9 +15,7 @@ public class CharacterLogicController : MonoBehaviour
 
     public LayerMask itemLayer; 
 
-    private Vector2 movementDirection; 
-    public delegate void OnHealthChanged(float currentHealth, float maxHealth);
-    public event OnHealthChanged HealthChanged;
+    private Vector2 movementDirection;
 
     [SerializeField]
     InventoryController inventoryController;
@@ -63,7 +61,7 @@ public class CharacterLogicController : MonoBehaviour
             direction = movementDirection;
         }
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0, 0, angle);
+        transform.rotation = Quaternion .Euler (0, 0, angle);
     }
 
     private void HandleShooting()
@@ -73,13 +71,11 @@ public class CharacterLogicController : MonoBehaviour
             Shoot();
         }
     }
-
     void HandleMovement()
     {
         if (movementDirection.magnitude > 0)
         {
-            Vector2 moveDirection = new Vector2(movementDirection.x, movementDirection.y);
-            rb.AddForce(moveDirection.normalized * moveSpeed);
+            rb.MovePosition(new Vector2(transform.position.x, transform.position.y) + movementDirection.normalized * Time.fixedDeltaTime * moveSpeed);
         }
         else
             rb.velocity = Vector2.zero;
@@ -91,11 +87,9 @@ public class CharacterLogicController : MonoBehaviour
         if (enemiesInRange.Length > 0)
         {
             closestEnemy = enemiesInRange[0].gameObject;
-
-            Vector3 direction = closestEnemy.transform.position - transform.position;
-            direction.y = 0;
-            Quaternion rotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * rotationSpeed);
+            Vector2 direction = closestEnemy.transform.position - transform.position;
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Euler(0, 0, angle);
 
         }
     }
@@ -139,22 +133,7 @@ public class CharacterLogicController : MonoBehaviour
 
     
 
-    public void TakeDamage(float damage)
-    {
-        health -= damage;
-        if (health < 0) health = 0;
-        HealthChanged?.Invoke(health, maxHealth);
-
-        if (health <= 0)
-        {
-            Die();
-        }
-    }
-
-    void Die()
-    {
-        Debug.Log("Персонаж умер!");
-    }
+   
 
     //internal bool TryPickupItem(ItemDetails itemDetails)
     //{

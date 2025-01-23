@@ -8,7 +8,7 @@ namespace Assets.WUG.Scripts
 {
     public class InventoryUIController 
     {
-        public Dictionary<InventorySlot, string> InventorySlots = new ();
+        public List<InventorySlot> InventorySlots = new ();
 
         private  VisualElement m_Root;
         private  VisualElement m_SlotContainer;
@@ -34,7 +34,7 @@ namespace Assets.WUG.Scripts
                 InventorySlot slot = new InventorySlot();
                 slot.Init(this);
 
-                InventorySlots.Add(slot,"");
+                InventorySlots.Add(slot);
 
                 m_SlotContainer.Add(slot);
             }
@@ -132,7 +132,7 @@ namespace Assets.WUG.Scripts
             }
 
             //Check to see if they are dropping the ghost icon over any inventory slots.
-            IEnumerable<InventorySlot> slots = InventorySlots.Keys.Where(x => x.worldBound.Overlaps(m_GhostIcon.worldBound));
+            IEnumerable<InventorySlot> slots = InventorySlots.Where(x => x.worldBound.Overlaps(m_GhostIcon.worldBound));
             Debug.Log(slots.Count() + " slots.Count()");
             //Found at least one
             if (slots.Count() != 0)
@@ -166,8 +166,6 @@ namespace Assets.WUG.Scripts
             to.HoldItem(inventoryController.GetItemByGuid(from.ItemGuid), inventoryController.GetItemCount(from.ItemGuid));
             Select(to);
             from.DropItem();
-            InventorySlots[from] = "";
-            InventorySlots[to] = to.GetGuid();
         }
 
         private void Swap(InventorySlot closestSlot, InventorySlot originalSlot)
@@ -176,8 +174,6 @@ namespace Assets.WUG.Scripts
             closestSlot.HoldItem(inventoryController.GetItemByGuid(originalSlot.ItemGuid), inventoryController.GetItemCount(originalSlot.ItemGuid));
             Select(closestSlot);
             originalSlot.HoldItem(inventoryController.GetItemByGuid(ClosestSlotItemGuid), inventoryController.GetItemCount(ClosestSlotItemGuid));
-            InventorySlots[closestSlot] = closestSlot.GetGuid();
-            InventorySlots[originalSlot] = originalSlot.GetGuid();
         }
 
         /// <summary>
@@ -192,23 +188,21 @@ namespace Assets.WUG.Scripts
             {
                 if (data.ChangeType == InventoryChangeType.Pickup)
                 {
-                    if (InventorySlots.ContainsValue(itemGUID))
+                    InventorySlot slot = InventorySlots.FirstOrDefault(x => x.GetGuid() == itemGUID);
+                    if (slot != null)
                     {
-                        InventorySlot slot = InventorySlots.FirstOrDefault(x => x.Key.GetGuid() == itemGUID).Key;
                         slot.HoldItem(inventoryController.GetItemByGuid(itemGUID), inventoryController.GetItemCount(itemGUID));
-                        InventorySlots[slot] = itemGUID;
                         return;
                     }
                     else
                     {
-                        var emptyPairSlot_guid = InventorySlots.FirstOrDefault(x => x.Key.GetGuid() == "");
-                        if (!EqualityComparer<KeyValuePair<InventorySlot, string>>.Default.Equals(emptyPairSlot_guid, default))
+                        InventorySlot emptySlot = InventorySlots.FirstOrDefault(x => x.GetGuid() == "");
+                        if (emptySlot!=null)
                         {
-                            emptyPairSlot_guid.Key.HoldItem(inventoryController.GetItemByGuid(itemGUID), data.Items[itemGUID]);
-                            InventorySlots[emptyPairSlot_guid.Key] = itemGUID;
+                            emptySlot.HoldItem(inventoryController.GetItemByGuid(itemGUID), data.Items[itemGUID]);
                         }
                         else
-                            throw new System.Exception("empty ui slot not found for added inventory item" + inventoryController.GetItemByGuid(itemGUID).name);
+                            throw new System.Exception("empty ui slot not found for added inventory item " + inventoryController.GetItemByGuid(itemGUID).name);
                     }
                 }
                 else if (data.ChangeType == InventoryChangeType.Drop)
