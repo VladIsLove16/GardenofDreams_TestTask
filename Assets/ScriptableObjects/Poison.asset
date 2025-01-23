@@ -9,10 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb81caa97636ee74fb4be314b01fc499, type: 3}
+  m_Script: {fileID: 11500000, guid: b3ca994b8af6ed1459ae578079b0d092, type: 3}
   m_Name: Poison
   m_EditorClassIdentifier: 
-  Name: Bottle of Poison
-  GUID: 50708398-2e1c-429f-8a38-637a6131d54b
+  Name: Poison
+  GUID: 77a11126-e2f8-4fec-9ad2-f5be45eb63ee
   Icon: {fileID: 21300000, guid: bcc5e8aeb794834419ec36a8c5982825, type: 3}
   CanDrop: 0

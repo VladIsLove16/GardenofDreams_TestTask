@@ -9,10 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb81caa97636ee74fb4be314b01fc499, type: 3}
+  m_Script: {fileID: 11500000, guid: b3ca994b8af6ed1459ae578079b0d092, type: 3}
   m_Name: Health Potion
   m_EditorClassIdentifier: 
-  Name: Health Potion
-  GUID: 18ed2002-8bb3-420e-bfc6-77a9e346a9d4
+  Name: Health Poison
+  GUID: 60fcacd8-c076-4ef4-b8bd-f9377d833d25
   Icon: {fileID: 21300000, guid: 57a87035364045d4ab424df0cbd5e155, type: 3}
   CanDrop: 0
